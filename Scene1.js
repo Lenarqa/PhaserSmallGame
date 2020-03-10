@@ -6,7 +6,10 @@ class Scene1 extends Phaser.Scene {
     preload(){
         //background
         this.load.image("background", "assets/background.png");
-        
+
+        //font
+        this.load.bitmapFont("pixelFont", "assets/font/font.png", "assets/font/font.xml");
+
         //ships
         this.load.spritesheet("ship", "assets/spritesheets/ship.png", {frameWidth: 16, frameHeight: 16});
         this.load.spritesheet("ship2", "assets/spritesheets/ship2.png", {frameWidth: 32, frameHeight: 16});
