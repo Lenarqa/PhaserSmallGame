@@ -8,10 +8,16 @@ class Scene2 extends Phaser.Scene{
         this.background.setOrigin(0,0);
 
         this.add.text(20,20, "Playing game", {font:"25px Arial", fill:"yellow"});
+
         //this.ship1 = this.add.image(config.width/2 - 50, config.height/2, "ship");
         this.ship1 = this.add.sprite(config.width/2 - 50, config.height/2, "ship");
         this.ship2 = this.add.sprite(config.width/2, config.height/2, "ship2");
         this.ship3 = this.add.sprite(config.width/2 + 50, config.height/2, "ship3");
+
+        this.enemies = this.physics.add.group();
+        this.enemies.add(this.ship1);
+        this.enemies.add(this.ship2);
+        this.enemies.add(this.ship3);
 
         this.powerUps = this.physics.add.group();
 
@@ -21,7 +27,7 @@ class Scene2 extends Phaser.Scene{
             this.powerUps.add(powerUp);
             powerUp.setRandomPosition(0, 0, config.width, config.height);
 
-            if(Math.random > 0.5){
+            if(Math.random() > 0.5){
                 powerUp.play("red");
             }else{
                 powerUp.play("gray");
@@ -48,11 +54,34 @@ class Scene2 extends Phaser.Scene{
         this.cursorKeys = this.input.keyboard.createCursorKeys();
         this.player.setCollideWorldBounds(true);
         this.spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        
         this.projectiles = this.add.group();
 
         this.physics.add.collider(this.projectiles, this.powerUps, function(projectile, powerUp){
             projectile.destroy();
         });
+
+        this.physics.add.overlap(this.player, this.powerUps, this.pickPowerUp, null, this);
+        
+        this.physics.add.overlap(this.player, this.enemies, this.hurtPlayer, null, this);
+        
+        this.physics.add.overlap(this.projectiles, this.enemies, this.hitEnemy, null, this);
+
+    }
+
+    hitEnemy(projectile, enemy){
+        projectile.destroy();
+        this.resetShipPos(enemy);
+    }
+
+    hurtPlayer(player, enemy){
+        this.resetShipPos(enemy);
+        player.x = config.width/2 - 8;
+        player.y = config.height - 64;
+    }
+
+    pickPowerUp(player, powerUp){
+        powerUp.disableBody(true, true);//hide powerUp after overlap
     }
 
     moveShip(ship, speed){
